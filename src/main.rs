@@ -1,6 +1,6 @@
 use num_bigint::{BigInt, RandBigInt};
 use num_traits::{One,Zero};
-/// Denis pidor
+
 
 use num_integer::{Integer};
 
