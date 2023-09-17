@@ -73,7 +73,7 @@ fn mod_inverse(e: &BigInt, phi: &BigInt) -> Option<BigInt> {
         b = &a % &b;
         a = new_a;
 
-        let new_x = x.clone() -&q * x1.clone();
+        let new_x = x.clone() - &q * x1.clone();
         let new_y = y.clone() - &q * y1.clone();
         x = x1;
         y = y1;
@@ -91,10 +91,8 @@ fn mod_inverse(e: &BigInt, phi: &BigInt) -> Option<BigInt> {
     }
 }
 
-
-
 fn main() {
-    let num_bits = 16;
+    let num_bits = 1024;
 
     let large_prime = generate_large_prime(num_bits);
 
@@ -106,7 +104,6 @@ fn main() {
 
     let e = find_e(&phi_n);
 
-
     // println!("First prime number {}", large_prime);
     // println!("Second prime number{}", large_prime2);
     // println!("N is equals{}", n);
@@ -116,7 +113,7 @@ fn main() {
 
     println!("Public key is {}", e);
 
-    let d =  mod_inverse(& e,& phi_n).expect("Error");
+    let d = mod_inverse(&e, &phi_n).expect("Error");
 
     let mut text = "Hello World".as_bytes();
     println!("{:?}", text);
@@ -129,7 +126,7 @@ fn main() {
     println!("encrypted: {:?}", encrypted);
 
     let decrypted: Vec<BigInt> = encrypted.into_iter().map(|x| x.modpow(&d, &n)).collect();
-    
+
     println!("decrypted: {:?}", decrypted);
     println!("Generated Large Prime Number: {}", d);
     println!("Generated Large Prime Number: {}", large_prime2);
