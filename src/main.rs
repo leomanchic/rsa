@@ -1,6 +1,6 @@
 use num_bigint::{BigInt, RandBigInt};
 use num_traits::{One, Zero};
-
+use std::str;
 use num_integer::Integer;
 
 fn is_prime(n: &BigInt, k: i32) -> bool {
@@ -92,7 +92,7 @@ fn mod_inverse(e: &BigInt, phi: &BigInt) -> Option<BigInt> {
 }
 
 fn main() {
-    let num_bits = 1024;
+    let num_bits = 64;
 
     let large_prime = generate_large_prime(num_bits);
 
@@ -127,7 +127,11 @@ fn main() {
 
     let decrypted: Vec<BigInt> = encrypted.into_iter().map(|x| x.modpow(&d, &n)).collect();
 
-    println!("decrypted: {:?}", decrypted);
+    for i in decrypted{
+        println!("{:?}",str::from_utf8(&i.to_bytes_be().1).unwrap());
+    }
+
+    // println!("decrypted: {:?}", decrypted);
     println!("Generated Large Prime Number: {}", d);
     println!("Generated Large Prime Number: {}", large_prime2);
 }
