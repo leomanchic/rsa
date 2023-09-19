@@ -62,7 +62,7 @@ fn find_e(phi: &BigInt) -> BigInt {
     };
     e
 }
-
+//Находим обратное по модулю Пример - ax = 1 (mod phi_n) , мы на ходим x - что является нашим приватным ключом
 fn mod_inverse(e: &BigInt, phi: &BigInt) -> Option<BigInt> {
     let zero = BigInt::zero();
     let one = BigInt::one();
@@ -107,6 +107,7 @@ fn processing() -> Result<(BigInt, BigInt, BigInt), Box<dyn Error>> {
 
     let e = find_e(&phi_n);
 
+    //Private key
     let d = mod_inverse(&e, &phi_n).expect("Error");
 
     println!("First prime number {}", large_prime);
@@ -121,7 +122,6 @@ fn processing() -> Result<(BigInt, BigInt, BigInt), Box<dyn Error>> {
 
     println!("Public key is {}", e);
 
-    let d = mod_inverse(&e, &phi_n).expect("Error");
     println!("Private key is {}", d);
 
     Ok((e, d, n))
@@ -147,7 +147,7 @@ fn serialization(enc: Vec<BigInt>) -> Result<(Vec<u8>), Box<dyn Error>> {
         ser_enc.extend_from_slice(&size);
         ser_enc.append(&mut v);
     }
-    Ok((ser_enc))
+    Ok(ser_enc)
 }
 
 fn deseriallization(peredacha: Vec<u8>) -> Result<Vec<BigInt>, Box<dyn Error>> {
@@ -194,7 +194,7 @@ fn decryption(desir: Vec<BigInt>, d: BigInt, n: BigInt) -> Result<Vec<BigInt>, B
 }
 
 fn main() {
-    let mut text = "Hello World".as_bytes();
+    let text = "Hello".as_bytes();
     println!("{:?}", text);
 
     let (e, d, n) = processing().unwrap();
