@@ -10,3 +10,4 @@ num-bigint = { version = "0.2.2", features = ["rand"] }
 num-traits = "0.2.16"
 num-integer ="*" 
 rand = "0.6"    
+clap = { version = "4.4.4", features = ["derive"] }

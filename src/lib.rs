@@ -1,4 +1,4 @@
-use num_bigint::{BigInt, RandBigInt};
+    use num_bigint::{BigInt, RandBigInt};
 use num_integer::Integer;
 use num_traits::{One, Zero};
 use std::error::Error;
