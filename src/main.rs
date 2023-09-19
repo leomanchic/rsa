@@ -1,6 +1,7 @@
 use num_bigint::{BigInt, RandBigInt};
 use num_integer::Integer;
 use num_traits::{One, Zero};
+use std::error::Error;
 use std::fs::File;
 use std::io::{Read, Write};
 use std::str;
@@ -93,8 +94,8 @@ fn mod_inverse(e: &BigInt, phi: &BigInt) -> Option<BigInt> {
     }
 }
 
-fn main() {
-    let num_bits = 1024;
+fn processing() -> Result<(BigInt, BigInt, BigInt), Box<dyn Error>> {
+    let num_bits = 512;
 
     let large_prime = generate_large_prime(num_bits);
 
@@ -106,55 +107,56 @@ fn main() {
 
     let e = find_e(&phi_n);
 
-    // println!("First prime number {}", large_prime);
-    // println!("Second prime number{}", large_prime2);
-    // println!("N is equals{}", n);
-    // println!("ph(N) is equals{}", &phi_n);
+    let d = mod_inverse(&e, &phi_n).expect("Error");
 
-    // println!("Generated Large Prime Number not equal: {}", large_prime != large_prime2);
+    println!("First prime number {}", large_prime);
+    println!("Second prime number{}", large_prime2);
+    println!("N is equals{}", n);
+    println!("ph(N) is equals{}", &phi_n);
+
+    println!(
+        "Generated Large Prime Number not equal: {}",
+        large_prime != large_prime2
+    );
 
     println!("Public key is {}", e);
 
     let d = mod_inverse(&e, &phi_n).expect("Error");
-    println!("LENYA LOX is {}", d);
+    println!("Private key is {}", d);
 
-    let mut text = "Hello World".as_bytes();
-    println!("{:?}", text);
+    Ok((e, d, n))
+}
 
-    let encrypted: Vec<BigInt> = text
+fn encryptinon(e: &BigInt, n: &BigInt, messege: &[u8]) -> Result<Vec<BigInt>, Box<dyn Error>> {
+    let encrypted: Vec<BigInt> = messege
         .into_iter()
         .map(|x| BigInt::from(*x as i32).modpow(&e, &n))
         .collect();
-
-    // println!("encrypted: {:?}", encrypted);
-
-    let mut peredacha: Vec<u8> = Vec::new();
-    for i in encrypted {
+    Ok(encrypted)
+}
+fn serialization(enc: Vec<BigInt>) -> Result<(Vec<u8>), Box<dyn Error>> {
+    let mut ser_enc: Vec<u8> = Vec::new();
+    for i in enc {
         let (sign, mut v) = i.to_bytes_le();
-        peredacha.push(match sign {
+        ser_enc.push(match sign {
             num_bigint::Sign::Minus => 0u8,
             num_bigint::Sign::NoSign => 1,
             num_bigint::Sign::Plus => 2,
         });
         let size = (v.len() as u16).to_le_bytes();
-        peredacha.extend_from_slice(&size);
-        peredacha.append(&mut v);
+        ser_enc.extend_from_slice(&size);
+        ser_enc.append(&mut v);
     }
+    Ok((ser_enc))
+}
 
-    let mut file = File::create("peredacha.bin").unwrap();
-    file.write_all(&peredacha).unwrap();
-
-    let mut file = File::open("peredacha.bin").unwrap();
-    let mut peredacha = vec![];
-    file.read_to_end(&mut peredacha).unwrap();
-    // file.write_all(&peredacha).unwrap();
-
+fn deseriallization(peredacha: Vec<u8>) -> Result<Vec<BigInt>, Box<dyn Error>> {
     let mut prinyli: Vec<BigInt> = vec![];
     let mut ptr = 0usize;
     let mut zakonchil: bool = false;
     while !zakonchil {
         let sign = peredacha[ptr];
-        println!("{}", sign);
+        // println!("{}", sign);
         let sign = match sign {
             0 => num_bigint::Sign::Minus,
             1 => num_bigint::Sign::NoSign,
@@ -177,24 +179,32 @@ fn main() {
         ptr += size as usize;
         let bigint = BigInt::from_bytes_le(sign, bytes);
         prinyli.push(bigint);
-        // println!("converted to bigint");
-        // ptr += 1;
-        // println!("ptr {ptr}");
         if ptr == peredacha.len() {
             zakonchil = true;
         }
     }
 
-    // [0][1]   [3]      [11][12]    [14]
-    // [0][1..2][3.. 3+8][11][12..13][14.. 14 + 6]
+    Ok(prinyli)
+}
 
-    let decrypted: Vec<BigInt> = prinyli.into_iter().map(|x| x.modpow(&d, &n)).collect();
+fn decryption(desir: Vec<BigInt>, d: BigInt, n: BigInt) -> Result<Vec<BigInt>, Box<dyn Error>> {
+    let decrypted: Vec<BigInt> = desir.into_iter().map(|x| x.modpow(&d, &n)).collect();
+    Ok(decrypted)
+}
 
-    for i in decrypted {
-        println!("{:?}", str::from_utf8(&i.to_bytes_be().1).unwrap());
+fn main() {
+    let mut text = "Hello World".as_bytes();
+    println!("{:?}", text);
+
+    let (e, d, n) = processing().unwrap();
+
+    let enc = encryptinon(&e, &n, text).unwrap();
+    println!("{:?}", enc);
+
+    let seria = serialization(enc).unwrap();
+    let desir = deseriallization(seria).unwrap();
+    let decr = decryption(desir, d, n).unwrap();
+    for i in decr {
+        print!("{}", str::from_utf8(&i.to_bytes_be().1).unwrap())
     }
-
-    // println!("decrypted: {:?}", decrypted);
-    println!("Generated Large Prime Number: {}", d);
-    println!("Generated Large Prime Number: {}", large_prime2);
 }
