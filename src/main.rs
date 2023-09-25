@@ -22,7 +22,6 @@ fn main() {
     let (e, d, n) = rsa::processing(args.bit_len).unwrap();
 
     let enc = rsa::encryptinon(&e, &n, text).unwrap();
-    // println!("{:?}", enc);
 
     let seria = rsa::serialization(enc).unwrap();
     let desir = rsa::deseriallization(seria).unwrap();
