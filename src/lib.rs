@@ -27,12 +27,6 @@ pub fn is_prime(n: &BigInt, k: i32) -> bool {
     true
 }
 
-pub fn xor(p_s_key: &[u8], messege: &[u8]) -> Vec<u8> {
-    let mut  key = p_s_key.iter().cycle();
-    let new_mes = messege.iter().map(|x| x ^ key.next().unwrap()).collect();
-    new_mes
-}
-
 pub fn generate_large_prime(bits: u32) -> BigInt {
     let mut rng = rand::thread_rng();
 
