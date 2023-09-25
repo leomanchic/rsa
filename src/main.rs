@@ -36,5 +36,5 @@ fn main() {
 
     let decrypted_xor_key: Vec<u8> = decr.into_iter().map(|x| x.to_bytes_be().1[0]).collect();
     let text_decryption = rsa::xor(&decrypted_xor_key, &text);
-    println!("{:?}", text_decryption);
+    println!("{:?}", text_decryption)
 }
