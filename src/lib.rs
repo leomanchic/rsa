@@ -1,8 +1,7 @@
-    use num_bigint::{BigInt, RandBigInt};
+use num_bigint::{BigInt, RandBigInt};
 use num_integer::Integer;
 use num_traits::{One, Zero};
 use std::error::Error;
-
 
 pub fn is_prime(n: &BigInt, k: i32) -> bool {
     if *n <= BigInt::one() {
@@ -26,6 +25,12 @@ pub fn is_prime(n: &BigInt, k: i32) -> bool {
     }
 
     true
+}
+
+pub fn xor(p_s_key: &[u8], messege: &[u8]) -> Vec<u8> {
+    let mut  key = p_s_key.iter().cycle();
+    let new_mes = messege.iter().map(|x| x ^ key.next().unwrap()).collect();
+    new_mes
 }
 
 pub fn generate_large_prime(bits: u32) -> BigInt {
@@ -108,15 +113,15 @@ pub fn processing(bit_length: u32) -> Result<(BigInt, BigInt, BigInt), Box<dyn E
     //Private key
     let d = mod_inverse(&e, &phi_n).expect("Error");
 
-    println!("First prime number {}", large_prime);
-    println!("Second prime number{}", large_prime2);
-    println!("N is equals{}", n);
-    println!("ph(N) is equals{}", &phi_n);
+    // println!("First prime number {}", large_prime);
+    // println!("Second prime number{}", large_prime2);
+    // println!("N is equals{}", n);
+    // println!("ph(N) is equals{}", &phi_n);
 
-    println!(
-        "Generated Large Prime Number not equal: {}",
-        large_prime != large_prime2
-    );
+    // println!(
+    //     "Generated Large Prime Number not equal: {}",
+    //     large_prime != large_prime2
+    // );
 
     println!("Public key is {}", e);
 
