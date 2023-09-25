@@ -1,15 +1,12 @@
 use clap::Parser;
 use rsa;
-use std::fs::File;
-use std::io::{Read, Write};
-use std::str;
 
 #[derive(Parser)]
 struct Cli {
     /// Bit length of keys
     #[arg(short, long, value_name = "len_of_key")]
     bit_len: u32,
-    // path: std::path::PathBuf,
+
     /// Value to encrypt
     #[arg(short, long, value_name = "messege_to_encrypt")]
     messege: String,

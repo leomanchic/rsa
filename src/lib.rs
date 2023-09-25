@@ -107,16 +107,6 @@ pub fn processing(bit_length: u32) -> Result<(BigInt, BigInt, BigInt), Box<dyn E
     //Private key
     let d = mod_inverse(&e, &phi_n).expect("Error");
 
-    // println!("First prime number {}", large_prime);
-    // println!("Second prime number{}", large_prime2);
-    // println!("N is equals{}", n);
-    // println!("ph(N) is equals{}", &phi_n);
-
-    // println!(
-    //     "Generated Large Prime Number not equal: {}",
-    //     large_prime != large_prime2
-    // );
-
     println!("Public key is {}", e);
 
     println!("Private key is {}", d);
@@ -170,8 +160,7 @@ pub fn deseriallization(peredacha: Vec<u8>) -> Result<Vec<BigInt>, Box<dyn Error
         ptr += 2;
         // println!("ptr {ptr}");
         let size = u16::from_le_bytes(size_bytes2);
-        // println!("size {size}");
-        // println!("ptr {ptr}");
+
         let bytes = &peredacha[ptr..(ptr + size as usize)];
         ptr += size as usize;
         let bigint = BigInt::from_bytes_le(sign, bytes);
@@ -180,7 +169,6 @@ pub fn deseriallization(peredacha: Vec<u8>) -> Result<Vec<BigInt>, Box<dyn Error
             zakonchil = true;
         }
     }
-    //hello
 
     Ok(prinyli)
 }
