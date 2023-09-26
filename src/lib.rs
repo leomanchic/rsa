@@ -1,7 +1,32 @@
 use num_bigint::{BigInt, RandBigInt};
 use num_integer::Integer;
 use num_traits::{One, Zero};
-use std::error::Error;
+use serde::Serialize;
+use std::{error::Error, fs::File, io::Write};
+use toml;
+
+#[derive(Serialize)]
+struct Config {
+    keys: Keys,
+}
+
+#[derive(Serialize)]
+struct Keys {
+    public_key: String,
+    privete_key: String,
+}
+
+pub fn toml_gen(pub_key: String, pr_key: String) {
+    let conf = Config {
+        keys: Keys {
+            privete_key: pr_key,
+            public_key: pub_key,
+        },
+    };
+    let mut file = File::create("config.toml").unwrap();
+    let mut toml = toml::to_string(&conf).unwrap();
+    file.write_all(&toml.as_bytes());
+}
 
 pub fn is_prime(n: &BigInt, k: i32) -> bool {
     if *n <= BigInt::one() {
@@ -28,7 +53,7 @@ pub fn is_prime(n: &BigInt, k: i32) -> bool {
 }
 
 pub fn xor(p_s_key: &[u8], messege: &[u8]) -> Vec<u8> {
-    let mut  key = p_s_key.iter().cycle();
+    let mut key = p_s_key.iter().cycle();
     let new_mes = messege.iter().map(|x| x ^ key.next().unwrap()).collect();
     new_mes
 }
@@ -122,10 +147,11 @@ pub fn processing(bit_length: u32) -> Result<(BigInt, BigInt, BigInt), Box<dyn E
     //     "Generated Large Prime Number not equal: {}",
     //     large_prime != large_prime2
     // );
-
     println!("Public key is {}", e);
-
+    //
     println!("Private key is {}", d);
+
+    toml_gen(format!("{}", e), format!("{}", d));
 
     Ok((e, d, n))
 }

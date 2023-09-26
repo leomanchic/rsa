@@ -4,7 +4,7 @@ use std::fs::File;
 use std::io::{Read, Write};
 
 #[derive(Parser)]
-struct Cli {
+    struct Cli {
     /// Bit length of keys
     #[arg(short, long, value_name = "len_of_key")]
     bit_len: u32,

@@ -11,3 +11,5 @@ num-traits = "0.2.16"
 num-integer ="*" 
 rand = "0.6"    
 clap = { version = "4.4.4", features = ["derive"] }
+toml = "0.8.1"
+serde = { version = "1.0.188", features = ["derive"] }
