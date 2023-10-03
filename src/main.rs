@@ -4,18 +4,19 @@ use rsamixed::blowfish::blowcrypt;
 
 #[derive(Parser)]
 struct Cli {
-    /// Bit length of keys
+    /// Bit length for RSA
     #[arg(short, long, value_name = "len_of_key")]
     bit_len: u32,
     // path: std::path::PathBuf,
-    // Value to encrypt
-    // #[arg(short, long, value_name = "messege_to_encrypt")]
-    // messege: String,
+    /// Key for Blowfish
+    #[arg(short, long, value_name = "key")]
+    key: String,
 }
 
 fn main() {
+    let args = Cli::parse();
     //Private key for Blowfish
-    let key = "verysecretpasswd";
+    let key = args.key;
     //Generation keys for blowfish
     let bf = blowcrypt::Blowfish::new(key.as_bytes()).unwrap();
 
@@ -26,11 +27,11 @@ fn main() {
 
     println!("Зашифровано с помощью blowfish{:02x?}", txt);
 
-    let args = Cli::parse();
+    
 
     let (e, d, n) = rsamixed::rsa::rsacrypt::processing(args.bit_len).unwrap();
 
-    rsamixed::config::configen::toml_gen(format!("{}",e), format!("{}",d),format!("{}",key));
+    rsamixed::config::configen::toml_gen(format!("{}", e), format!("{}", d), format!("{}", key));
 
     //Encryption Blowfish key with rsa public key
     let enc = rsamixed::rsa::rsacrypt::encryptinon(&e, &n, key.as_bytes()).unwrap();
