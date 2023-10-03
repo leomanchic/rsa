@@ -350,7 +350,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "rsa"
+name = "rsamixed"
 version = "0.1.0"
 dependencies = [
  "clap",
