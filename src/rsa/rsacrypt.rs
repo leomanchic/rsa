@@ -3,7 +3,6 @@ use num_integer::Integer;
 use num_traits::{One, Zero};
 use std::{error::Error, fs::File, io::Write};
 
-
 pub fn is_prime(n: &BigInt, k: i32) -> bool {
     if *n <= BigInt::one() {
         return false;
@@ -52,6 +51,7 @@ pub fn generate_large_prime(bits: u32) -> BigInt {
     candidate
 }
 
+//Public expo finder
 pub fn find_e(phi: &BigInt) -> BigInt {
     let mut rng = rand::thread_rng();
 
@@ -66,7 +66,7 @@ pub fn find_e(phi: &BigInt) -> BigInt {
     };
     e
 }
-//Находим обратное по модулю Пример - ax = 1 (mod phi_n) , мы на ходим x - что является нашим приватным ключом
+//Находим обратное по модулю Пример - ax = 1 (mod phi_n) , мы на ходим x - что является нашей секретной экспонентой
 pub fn mod_inverse(e: &BigInt, phi: &BigInt) -> Option<BigInt> {
     let zero = BigInt::zero();
     let one = BigInt::one();
@@ -99,24 +99,28 @@ pub fn mod_inverse(e: &BigInt, phi: &BigInt) -> Option<BigInt> {
 }
 
 pub fn processing(bit_length: u32) -> Result<(BigInt, BigInt, BigInt), Box<dyn Error>> {
+    //number length in bits
     let num_bits = bit_length;
 
     let large_prime = generate_large_prime(num_bits);
 
     let large_prime2 = generate_large_prime(num_bits);
 
+    // modulo
     let n = &large_prime * &large_prime2;
 
+    //Euler function
     let phi_n = (&large_prime - BigInt::one()) * (&large_prime2 - BigInt::one());
 
+    //public exponent
     let e = find_e(&phi_n);
 
-    //Private key
+    //Private exponent
     let d = mod_inverse(&e, &phi_n).expect("Error");
 
-    // println!("Public key is {}", e);
+    // println!("Public key is {}{}", e,n);
     //
-    // println!("Private key is {}", d);
+    // println!("Private key is {}{}", d,n);
 
     Ok((e, d, n))
 }
