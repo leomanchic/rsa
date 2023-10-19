@@ -1,7 +1,11 @@
-use std::fs::File;
-
 use clap::Parser;
 use num_bigint::BigInt;
+use pem::{encode, Pem};
+// use sha256::{digest, try_digest};
+use std::{
+    fs::File,
+    io::{Read, Write},
+};
 // use num_bigint::BigInt;
 use rsamixed::{blowfish::blowcrypt, rsa};
 
@@ -10,10 +14,12 @@ struct Cli {
     /// Bit length for RSA
     #[arg(short, long, value_name = "len_of_key")]
     bit_len: u32,
-    // path: std::path::PathBuf,
     /// Key for Blowfish
     #[arg(short, long, value_name = "key")]
     key: String,
+    /// File to write key
+    #[arg(short, long, value_name = "file")]
+    file: String,
 }
 
 fn main() {
@@ -32,27 +38,45 @@ fn main() {
 
     let (e, d, n) = rsamixed::rsa::rsacrypt::processing(args.bit_len).unwrap();
 
-    //Person 2
-    let key_2: String = "hollysh".to_string();
-    let bf_1 = blowcrypt::Blowfish::new(key_2.as_bytes()).unwrap();
+    let mut file = File::create(args.file).unwrap();
+    let serialized_e = e.to_bytes_be().1;
+    let serialized_n = n.to_bytes_be().1;
+    let serialized_d = d.to_bytes_be().1;
 
-    let mut txt_2 = b"Maksimka".to_vec();
-    println!("Без шифрования (Person2):{:02x?}", txt_2);
-    //Blowfish encryption Person2
-    bf_1.encrypt_block((&mut txt_2[..8]).try_into().unwrap());
+    let val = Pem::new("PUBLIC KEY", serialized_e);
+    let public = pem::encode(&val);
 
-    println!("Зашифровано с помощью blowfish{:02x?}", txt_2);
+    let val = Pem::new("N VALUE", serialized_n);
+    let nn = pem::encode(&val);
 
-    let encrypt = rsamixed::rsa::rsacrypt::encryptinon(&e, &n, key_2.as_bytes()).unwrap();
+    let val = Pem::new("PRIVATE KEY", serialized_d);
+    let private = pem::encode(&val);
 
-    //Person 1
-    let decr = rsamixed::rsa::rsacrypt::decryption(encrypt, d, n).unwrap();
-    let decrypted_xor_key: Vec<u8> = decr.into_iter().map(|x| x.to_bytes_be().1[0]).collect();
+    file.write_all(public.as_bytes()).unwrap();
+    file.write_all(nn.as_bytes()).unwrap();
+    file.write_all(private.as_bytes()).unwrap();
 
-    let bf_2 = blowcrypt::Blowfish::new(&decrypted_xor_key).unwrap();
+    // //Person 2
+    // let key_2: String = "hollysh".to_string();
+    // let bf_1 = blowcrypt::Blowfish::new(key_2.as_bytes()).unwrap();
 
-    bf_2.decrypt_block((&mut txt_2[..8]).try_into().unwrap());
-    println!("Расшифровка сообщения(от Person2){:02x?}", txt_2);
+    // let mut txt_2 = b"Maksimka".to_vec();
+    // println!("Без шифрования (Person2):{:02x?}", txt_2);
+    // //Blowfish encryption Person2
+    // bf_1.encrypt_block((&mut txt_2[..8]).try_into().unwrap());
+
+    // println!("Зашифровано с помощью blowfish{:02x?}", txt_2);
+
+    // let encrypt = rsamixed::rsa::rsacrypt::encryptinon(&e, &n, key_2.as_bytes()).unwrap();
+
+    // //Person 1
+    // let decr = rsamixed::rsa::rsacrypt::decryption(encrypt, d, n).unwrap();
+    // let decrypted_xor_key: Vec<u8> = decr.into_iter().map(|x| x.to_bytes_be().1[0]).collect();
+
+    // let bf_2 = blowcrypt::Blowfish::new(&decrypted_xor_key).unwrap();
+
+    // bf_2.decrypt_block((&mut txt_2[..8]).try_into().unwrap());
+    // println!("Расшифровка сообщения(от Person2){:02x?}", txt_2);
 
     // let (e, d, n) = rsamixed::rsa::rsacrypt::processing(args.bit_len).unwrap();
     // println!("{}",e);
@@ -85,3 +109,39 @@ fn main() {
 
     // println!("{:?}", text_decryption)
 }
+
+#[cfg(test)]
+#[test]
+fn it_works() {
+    // use pem::{encode, Pem};
+
+    // let input = String::from("hello");
+    // let bit_len: u32 = 512;
+    // let (e, d, n) = rsamixed::rsa::rsacrypt::processing(bit_len).unwrap();
+    // let serialized_e = e.to_bytes_be().1;
+
+    // println!("e {}", e);
+
+    // let val = Pem::new("PUBLIC KEY", serialized_e);
+    // println!("PEM {:?}", val);
+    // let public = pem::encode(&val);
+    // println!("PEM {:?}", public);
+    // let back = pem::parse(public).unwrap();
+    // let backed = BigInt::from_signed_bytes_be(back.contents());
+    // // println!("{}", backed);
+    // assert_eq!(e, backed)
+}
+
+#[test]
+fn file_read() {
+    let mut buf: Vec<u8> = Vec::new();
+    let mut file = File::open("out.txt").unwrap();
+    file.read_to_end(&mut buf);
+    let key = pem::parse_many(buf).unwrap();
+    let expo = BigInt::from_signed_bytes_be(key[0].contents());
+    let n = BigInt::from_signed_bytes_be(key[1].contents());
+    let d = BigInt::from_signed_bytes_be(key[2].contents());
+    println!("{}\n{}\n\n{}\n{}\n", key[0].tag(), expo, key[1].tag(), n);
+    println!("{}\n{}", key[2].tag(), d);
+}
+fn encrypt() {}
