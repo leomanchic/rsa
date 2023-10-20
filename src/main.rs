@@ -29,10 +29,11 @@ fn main() {
     //Generation keys for blowfish Person1
     let bf = blowcrypt::Blowfish::new(key.as_bytes()).unwrap();
 
-    let mut txt = b"Leomanchic".to_vec();
+    let mut txt = b"Leomanchhicghicg".to_vec();
     println!("Без шифрования от Person1:{:02x?}", txt);
     //Blowfish encryption Person1
     bf.encrypt_block((&mut txt[..8]).try_into().unwrap());
+    // bf.encrypt_block((&mut txt[8..16]).try_into().unwrap());
 
     println!("Зашифровано с помощью blowfish Person1\n{:02x?}", txt);
 
@@ -140,8 +141,41 @@ fn file_read() {
     let key = pem::parse_many(buf).unwrap();
     let expo = BigInt::from_signed_bytes_be(key[0].contents());
     let n = BigInt::from_signed_bytes_be(key[1].contents());
-    let d = BigInt::from_signed_bytes_be(key[2].contents());
-    println!("{}\n{}\n\n{}\n{}\n", key[0].tag(), expo, key[1].tag(), n);
-    println!("{}\n{}", key[2].tag(), d);
+    // let d = BigInt::from_signed_bytes_be(key[2].contents());
+    // println!("{}\n{}\n\n{}\n{}\n", key[0].tag(), expo, key[1].tag(), n);
+    // println!("{}\n{}", key[2].tag(), d);
+
+    let key = "leon";
+    println!("key as b{:?}", key.as_bytes());
+    //Generation keys for blowfish Person1
+    let bf = blowcrypt::Blowfish::new(key.as_bytes()).unwrap();
+
+    let mut txt = b"Leonardo".to_vec();
+    println!("Без шифрования текст:{:02x?}", txt);
+    //Blowfish encryption Person1
+    bf.encrypt_block((&mut txt[..8]).try_into().unwrap());
+    let encrypted_blow_key = rsa::rsacrypt::encryptinon(&expo, &n, key.as_bytes()).unwrap();
+    let serialize_blow_key = rsa::rsacrypt::serialization(encrypted_blow_key).unwrap();
+
+    let mut file = File::create("sesion_key.txt").unwrap();
+    file.write_all(&serialize_blow_key).unwrap();
+
+    // println!("Сообщение зашфрованное по ключу blowfish {:?}\n Зашифрованный публичным ключом, ключ blowfish {:?}", txt,encrypted_blow_key.unwrap())
 }
-fn encrypt() {}
+#[test]
+fn decryption() {
+    let mut buf: Vec<u8> = Vec::new();
+    let mut file = File::open("out.txt").unwrap();
+    file.read_to_end(&mut buf);
+    let key = pem::parse_many(buf).unwrap();
+    let d = BigInt::from_signed_bytes_be(key[2].contents());
+    let n = BigInt::from_signed_bytes_be(key[1].contents());
+
+    let mut buf: Vec<u8> = Vec::new();
+    let mut file1 = File::open("sesion_key.txt").unwrap();
+    file1.read_to_end(&mut buf);
+    let decripted_key = rsa::rsacrypt::deseriallization(buf).unwrap();
+    let decripted_key = rsa::rsacrypt::decryption(decripted_key, d, n);
+    // let serialized_key = rsa::rsacrypt::serialization(decripted_key.unwrap());
+    println!("{:?}", decripted_key);
+}

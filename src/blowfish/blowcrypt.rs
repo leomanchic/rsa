@@ -223,17 +223,12 @@ impl Blowfish {
 
     // #[inline(always)]
     pub fn decrypt_lr(&self, l: &mut u32, r: &mut u32) {
-        self.pbox
-            .chunks_exact(2)
-            
-            .rev()
-            .take(8)
-            .for_each(|pr| {
-                *l ^= pr.to_vec()[1];
-                *r ^= self.round(*l);
-                *r ^= pr.to_vec()[0];
-                *l ^= self.round(*r);
-            });
+        self.pbox.chunks_exact(2).rev().take(8).for_each(|pr| {
+            *l ^= pr.to_vec()[1];
+            *r ^= self.round(*l);
+            *r ^= pr.to_vec()[0];
+            *l ^= self.round(*r);
+        });
 
         *l ^= self.pbox[1];
         *r ^= self.pbox[0];
