@@ -94,7 +94,11 @@ pub fn mod_inverse(e: &BigInt, phi: &BigInt) -> Option<BigInt> {
         if x < zero {
             x += phi;
         }
-        Some(x)
+        if x != b {
+            Some(x)
+        } else {
+            None
+        }
     }
 }
 

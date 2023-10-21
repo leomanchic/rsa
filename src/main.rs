@@ -40,23 +40,10 @@ fn main() {
     let (e, d, n) = rsamixed::rsa::rsacrypt::processing(args.bit_len).unwrap();
 
     let mut file = File::create(args.file).unwrap();
-    let serialized_e = e.to_bytes_be().1;
-    let serialized_n = n.to_bytes_be().1;
-    let serialized_d = d.to_bytes_be().1;
+    let (serialized_e,serialized_n,serialized_d) = (e.to_bytes_be().1,n.to_bytes_be().1,d.to_bytes_be().1);
 
-    let val = Pem::new("PUBLIC KEY", serialized_e);
-    let public = pem::encode(&val);
-
-    let val = Pem::new("N VALUE", serialized_n);
-    let nn = pem::encode(&val);
-
-    let val = Pem::new("PRIVATE KEY", serialized_d);
-    let private = pem::encode(&val);
-
-    file.write_all(public.as_bytes()).unwrap();
-    file.write_all(nn.as_bytes()).unwrap();
-    file.write_all(private.as_bytes()).unwrap();
-
+    rsamixed::config::configen::pem_gen(&serialized_e, &serialized_n, &serialized_d);
+    
     // //Person 2
     // let key_2: String = "hollysh".to_string();
     // let bf_1 = blowcrypt::Blowfish::new(key_2.as_bytes()).unwrap();
@@ -124,7 +111,7 @@ fn it_works() {
     // println!("e {}", e);
 
     // let val = Pem::new("PUBLIC KEY", serialized_e);
-    // println!("PEM {:?}", val);
+    // println!("PEM {:?}", val);extern crate crypto;
     // let public = pem::encode(&val);
     // println!("PEM {:?}", public);
     // let back = pem::parse(public).unwrap();
@@ -136,12 +123,13 @@ fn it_works() {
 #[test]
 fn file_read() {
     let mut buf: Vec<u8> = Vec::new();
-    let mut file = File::open("out.txt").unwrap();
+    let mut file = File::open("config.pem").unwrap();
     file.read_to_end(&mut buf);
     let key = pem::parse_many(buf).unwrap();
     let expo = BigInt::from_signed_bytes_be(key[0].contents());
     let n = BigInt::from_signed_bytes_be(key[1].contents());
-    // let d = BigInt::from_signed_bytes_be(key[2].contents());
+    let d = BigInt::from_signed_bytes_be(key[2].contents());
+    assert_ne!(d, expo);
     // println!("{}\n{}\n\n{}\n{}\n", key[0].tag(), expo, key[1].tag(), n);
     // println!("{}\n{}", key[2].tag(), d);
 
@@ -165,7 +153,7 @@ fn file_read() {
 #[test]
 fn decryption() {
     let mut buf: Vec<u8> = Vec::new();
-    let mut file = File::open("out.txt").unwrap();
+    let mut file = File::open("config.pem").unwrap();
     file.read_to_end(&mut buf);
     let key = pem::parse_many(buf).unwrap();
     let d = BigInt::from_signed_bytes_be(key[2].contents());
