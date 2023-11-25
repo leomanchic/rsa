@@ -375,7 +375,6 @@ dependencies = [
  "num-traits",
  "pem",
  "rand 0.6.5",
- "serde",
  "toml",
 ]
 

@@ -15,6 +15,13 @@ pub fn is_prime(n: &BigInt, k: i32) -> bool {
         return false;
     }
 
+    // match *n {
+    // n if n <= BigInt::one() =>  return false,
+    // n if n <= BigInt::from(3i32) => return  true,
+    // n if n.is_multiple_of(&BigInt::from(2i32)) || n.is_multiple_of(&BigInt::from(3i32)) => return false,
+    // n
+    // }
+
     let mut rng = rand::thread_rng();
     for _ in 0..k {
         let a = rng.gen_bigint_range(&BigInt::from(2i32), &(n - BigInt::from(2i32)));

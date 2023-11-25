@@ -39,11 +39,18 @@ fn main() {
 
     let (e, d, n) = rsamixed::rsa::rsacrypt::processing(args.bit_len).unwrap();
 
-    let mut file = File::create(args.file).unwrap();
-    let (serialized_e,serialized_n,serialized_d) = (e.to_bytes_be().1,n.to_bytes_be().1,d.to_bytes_be().1);
+    let mut file = File::create(&args.file).unwrap();
+    let (serialized_e, serialized_n, serialized_d) =
+        (e.to_bytes_be().1, n.to_bytes_be().1, d.to_bytes_be().1);
 
-    rsamixed::config::configen::pem_gen(&serialized_e, &serialized_n, &serialized_d);
-    
+    // rsamixed::config::configen::pem_gen(&serialized_e, &serialized_n, &serialized_d, None);
+    rsamixed::config::configen::pem_gen(
+        &serialized_e,
+        &serialized_n,
+        &serialized_d,
+        Some(&args.file),
+    )
+
     // //Person 2
     // let key_2: String = "hollysh".to_string();
     // let bf_1 = blowcrypt::Blowfish::new(key_2.as_bytes()).unwrap();
@@ -166,4 +173,5 @@ fn decryption() {
     let decripted_key = rsa::rsacrypt::decryption(decripted_key, d, n);
     // let serialized_key = rsa::rsacrypt::serialization(decripted_key.unwrap());
     println!("{:?}", decripted_key);
+    // assert_eq!(b"leon", decripted_key)
 }

@@ -39,7 +39,7 @@ use std::{error::Error, fs::File, io::Write};
 //     file.write_all(&toml.as_bytes());
 // }
 
-pub fn pem_gen(pub_expo: &[u8], module: &[u8], priv_d: &[u8]) {
+pub fn pem_gen(pub_expo: &[u8], module: &[u8], priv_d: &[u8], file: Option<&str>) {
     let serialized_e = pub_expo;
     let serialized_n = module;
     let serialized_d = priv_d;
@@ -53,8 +53,14 @@ pub fn pem_gen(pub_expo: &[u8], module: &[u8], priv_d: &[u8]) {
     let val = Pem::new("PRIVATE KEY", serialized_d);
     let private = pem::encode(&val);
 
-    let mut file = File::create("config.pem").unwrap();
-    file.write_all(public.as_bytes()).unwrap();
-    file.write_all(nn.as_bytes()).unwrap();
-    file.write_all(private.as_bytes()).unwrap();
+    //file with pub key(e,n)
+    let mut file_to_send = File::create(file.unwrap()).unwrap();
+    file_to_send.write_all(public.as_bytes()).unwrap();
+    file_to_send.write_all(nn.as_bytes()).unwrap();
+
+    // file with pub and prvt key
+    let mut config_ = File::create("config").unwrap();
+    config_.write_all(public.as_bytes()).unwrap();
+    config_.write_all(nn.as_bytes()).unwrap();
+    config_.write_all(private.as_bytes()).unwrap();
 }
