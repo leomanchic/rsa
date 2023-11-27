@@ -59,7 +59,7 @@ pub fn pem_gen(pub_expo: &[u8], module: &[u8], priv_d: &[u8], file: Option<&str>
     file_to_send.write_all(nn.as_bytes()).unwrap();
 
     // file with pub and prvt key
-    let mut config_ = File::create("config").unwrap();
+    let mut config_ = File::create("config.pem").unwrap();
     config_.write_all(public.as_bytes()).unwrap();
     config_.write_all(nn.as_bytes()).unwrap();
     config_.write_all(private.as_bytes()).unwrap();

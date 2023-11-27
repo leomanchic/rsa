@@ -140,7 +140,7 @@ fn file_read() {
     // println!("{}\n{}\n\n{}\n{}\n", key[0].tag(), expo, key[1].tag(), n);
     // println!("{}\n{}", key[2].tag(), d);
 
-    let key = "leon";
+    let key = "leonardin";
     println!("key as b{:?}", key.as_bytes());
     //Generation keys for blowfish Person1
     let bf = blowcrypt::Blowfish::new(key.as_bytes()).unwrap();
