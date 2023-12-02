@@ -1,8 +1,9 @@
 use num_bigint::{BigInt, RandBigInt};
 use num_integer::Integer;
 use num_traits::{One, Zero};
-use std::{error::Error, fs::File, io::Write};
+use std::error::Error;
 
+// The Miller-Rabin algorithm is used here https://en.wikipedia.org/wiki/Fermat%27s_little_theorem
 pub fn is_prime(n: &BigInt, k: i32) -> bool {
     if *n <= BigInt::one() {
         return false;
