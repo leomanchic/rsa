@@ -175,3 +175,13 @@ fn decryption() {
     println!("{:?}", decripted_key);
     // assert_eq!(b"leon", decripted_key)
 }
+
+#[test]
+
+fn param_show_case() {
+    let m = rsa::rsacrypt::processing(8).unwrap();
+    let mut file = File::create("show_param.txt").unwrap();
+    file.write_all(format!("{}\n{}\n{}\n", m.0, m.1, m.2).as_bytes())
+        .unwrap();
+    println!("{}", m.1)
+}
